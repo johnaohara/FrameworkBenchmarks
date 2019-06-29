@@ -5,16 +5,16 @@
 Running 5s test @ http://tfb-server:8080/plaintext
   8 threads and 8 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     4.98ms    8.38ms  91.93ms   91.50%
-    Req/Sec   383.12    246.66     1.23k    62.75%
+    Latency     7.06ms   20.48ms 289.05ms   95.54%
+    Req/Sec   464.71    317.01     1.70k    66.58%
   Latency Distribution
-     50%    1.94ms
-     75%    5.85ms
-     90%   12.01ms
-     99%   42.69ms
-  15301 requests in 5.02s, 2.48MB read
-Requests/sec:   3047.71
-Transfer/sec:    505.97KB
+     50%    1.54ms
+     75%    5.51ms
+     90%   13.47ms
+     99%  119.90ms
+  18229 requests in 5.04s, 2.96MB read
+Requests/sec:   3617.99
+Transfer/sec:    600.64KB
 ---------------------------------------------------------
  Running Warmup plaintext
  wrk -H 'Host: tfb-server' -H 'Accept: text/plain,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 15 -c 512 --timeout 8 -t 4 http://tfb-server:8080/plaintext
@@ -22,16 +22,16 @@ Transfer/sec:    505.97KB
 Running 15s test @ http://tfb-server:8080/plaintext
   4 threads and 512 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    45.90ms   27.41ms 355.48ms   81.44%
-    Req/Sec     2.94k   619.65     4.15k    66.44%
+    Latency    36.70ms   25.07ms 302.70ms   84.82%
+    Req/Sec     3.78k   841.67     5.36k    68.50%
   Latency Distribution
-     50%   39.34ms
-     75%   54.20ms
-     90%   76.60ms
-     99%  152.34ms
-  174782 requests in 15.04s, 28.34MB read
-Requests/sec:  11619.93
-Transfer/sec:      1.88MB
+     50%   29.69ms
+     75%   42.11ms
+     90%   63.49ms
+     99%  141.05ms
+  226074 requests in 15.09s, 36.65MB read
+Requests/sec:  14984.50
+Transfer/sec:      2.43MB
 ---------------------------------------------------------
  Concurrency: 256 for plaintext
  wrk -H 'Host: tfb-server' -H 'Accept: text/plain,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 15 -c 256 --timeout 8 -t 4 http://tfb-server:8080/plaintext -s pipeline.lua -- 16
@@ -39,18 +39,18 @@ Transfer/sec:      1.88MB
 Running 15s test @ http://tfb-server:8080/plaintext
   4 threads and 256 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    96.67ms   55.91ms 580.71ms   61.42%
-    Req/Sec     6.14k     2.13k   12.32k    71.74%
+    Latency    81.87ms   51.84ms 576.87ms   65.98%
+    Req/Sec     7.79k     2.89k   15.04k    70.00%
   Latency Distribution
-     50%  124.31ms
-     75%  203.62ms
-     90%    0.00us
+     50%   78.64ms
+     75%  124.59ms
+     90%  176.41ms
      99%    0.00us
-  366400 requests in 15.08s, 59.40MB read
-Requests/sec:  24294.83
-Transfer/sec:      3.94MB
-STARTTIME 1561786792
-ENDTIME 1561786808
+  466096 requests in 15.08s, 75.57MB read
+Requests/sec:  30903.31
+Transfer/sec:      5.01MB
+STARTTIME 1561790952
+ENDTIME 1561790967
 ---------------------------------------------------------
  Concurrency: 1024 for plaintext
  wrk -H 'Host: tfb-server' -H 'Accept: text/plain,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 15 -c 1024 --timeout 8 -t 4 http://tfb-server:8080/plaintext -s pipeline.lua -- 16
@@ -58,18 +58,18 @@ ENDTIME 1561786808
 Running 15s test @ http://tfb-server:8080/plaintext
   4 threads and 1024 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   246.90ms  137.54ms   1.12s    64.45%
-    Req/Sec     9.55k     4.37k   21.76k    64.67%
+    Latency   196.82ms  101.32ms 744.31ms   59.08%
+    Req/Sec    11.56k     4.12k   31.68k    73.06%
   Latency Distribution
-     50%  246.55ms
-     75%  352.53ms
-     90%  432.94ms
+     50%  205.05ms
+     75%  290.93ms
+     90%  352.61ms
      99%    0.00us
-  556576 requests in 15.08s, 90.23MB read
-Requests/sec:  36908.88
-Transfer/sec:      5.98MB
-STARTTIME 1561786810
-ENDTIME 1561786825
+  684848 requests in 15.10s, 111.03MB read
+Requests/sec:  45359.73
+Transfer/sec:      7.35MB
+STARTTIME 1561790969
+ENDTIME 1561790984
 ---------------------------------------------------------
  Concurrency: 4096 for plaintext
  wrk -H 'Host: tfb-server' -H 'Accept: text/plain,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 15 -c 4096 --timeout 8 -t 4 http://tfb-server:8080/plaintext -s pipeline.lua -- 16
@@ -77,18 +77,18 @@ ENDTIME 1561786825
 Running 15s test @ http://tfb-server:8080/plaintext
   4 threads and 4096 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   952.37ms  508.35ms   2.28s    60.45%
-    Req/Sec     9.13k     8.95k   61.09k    83.74%
+    Latency   877.91ms  459.32ms   2.22s    59.95%
+    Req/Sec     9.88k     6.82k   48.32k    71.13%
   Latency Distribution
-     50%  929.63ms
-     75%    1.36s 
-     90%    1.65s 
-     99%    2.02s 
-  535104 requests in 15.11s, 86.75MB read
-Requests/sec:  35425.18
-Transfer/sec:      5.74MB
-STARTTIME 1561786827
-ENDTIME 1561786842
+     50%  876.00ms
+     75%    1.27s 
+     90%    1.52s 
+     99%    2.10s 
+  574240 requests in 15.05s, 93.10MB read
+Requests/sec:  38159.08
+Transfer/sec:      6.19MB
+STARTTIME 1561790986
+ENDTIME 1561791002
 ---------------------------------------------------------
  Concurrency: 16384 for plaintext
  wrk -H 'Host: tfb-server' -H 'Accept: text/plain,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 15 -c 16384 --timeout 8 -t 4 http://tfb-server:8080/plaintext -s pipeline.lua -- 16
@@ -96,16 +96,16 @@ ENDTIME 1561786842
 Running 15s test @ http://tfb-server:8080/plaintext
   4 threads and 16384 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     3.85s     1.36s    7.16s    69.54%
-    Req/Sec    12.05k    16.63k   90.06k    86.84%
+    Latency     4.22s     1.93s    8.00s    59.10%
+    Req/Sec     9.94k    16.92k  149.76k    90.94%
   Latency Distribution
-     50%    3.51s 
-     75%    4.70s 
-     90%    6.14s 
-     99%    6.48s 
-  152144 requests in 15.07s, 24.67MB read
-  Socket errors: connect 0, read 283, write 0, timeout 320
-Requests/sec:  10094.87
-Transfer/sec:      1.64MB
-STARTTIME 1561786844
-ENDTIME 1561786860
+     50%    4.24s 
+     75%    5.73s 
+     90%    6.91s 
+     99%    7.71s 
+  260240 requests in 15.09s, 42.19MB read
+  Socket errors: connect 0, read 3, write 0, timeout 1532
+Requests/sec:  17240.38
+Transfer/sec:      2.80MB
+STARTTIME 1561791004
+ENDTIME 1561791019
