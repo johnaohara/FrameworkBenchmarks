@@ -13,12 +13,8 @@ import java.io.IOException;
 @WebFilter("/*")
 public class ServletHeaderFilter extends HttpFilter {
 
-    private static final String CONTENT_TYPE_HEADER = io.undertow.util.Headers.CONTENT_TYPE.toString();
-    private static final String CONTENT_TYPE = "text/plain; charset=utf-8";
     private static final String SERVER_TYPE = "Server";
     private static final String SERVER = "Quarkus";
-
-    private static final String HELLO = "Hello, World!";
 
 
     @Override
@@ -26,13 +22,9 @@ public class ServletHeaderFilter extends HttpFilter {
 
         HttpServletResponse myResponse = (HttpServletResponse) res;
         MyResponseRequestWrapper responseWrapper = new MyResponseRequestWrapper(myResponse);
-        responseWrapper.addHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE);
         responseWrapper.addHeader(SERVER_TYPE, SERVER);
-        responseWrapper.setStatus(200);
 
-        responseWrapper.getOutputStream().println(HELLO);
-        responseWrapper.getOutputStream().close();
-
+        chain.doFilter(req, res);
     }
 
     class MyResponseRequestWrapper extends HttpServletResponseWrapper {
