@@ -17,7 +17,6 @@ public class FortuneRepository {
     @Inject
     EntityManager em;
 
-    @Transactional
     public List<Fortune> findAll() {
         Query query = em.createQuery("SELECT f FROM Fortune f");
         return query.getResultList();
