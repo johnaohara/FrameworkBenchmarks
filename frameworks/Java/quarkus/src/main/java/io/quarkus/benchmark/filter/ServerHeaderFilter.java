@@ -8,8 +8,11 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class ServerHeaderFilter implements ContainerResponseFilter {
 
+    private static final String SERVER_HEADER = "Server";
+private static final String SERVER = "Quarkus";
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-        responseContext.getHeaders().add("Server", "Quarkus");
+        responseContext.getHeaders().add(SERVER_HEADER, SERVER);
     }
 }
