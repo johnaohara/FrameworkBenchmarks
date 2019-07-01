@@ -18,6 +18,8 @@ public class ServletHeaderFilter extends HttpFilter {
     private static final String SERVER_TYPE = "Server";
     private static final String SERVER = "Quarkus";
 
+    private static final String HELLO = "Hello, World!";
+
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -26,8 +28,10 @@ public class ServletHeaderFilter extends HttpFilter {
         MyResponseRequestWrapper responseWrapper = new MyResponseRequestWrapper(myResponse);
         responseWrapper.addHeader(CONTENT_TYPE_HEADER, CONTENT_TYPE);
         responseWrapper.addHeader(SERVER_TYPE, SERVER);
+        responseWrapper.setStatus(200);
 
-        chain.doFilter(req, myResponse);
+        responseWrapper.getOutputStream().println(HELLO);
+        responseWrapper.getOutputStream().close();
 
     }
 
