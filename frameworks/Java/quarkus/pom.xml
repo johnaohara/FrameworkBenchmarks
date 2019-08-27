@@ -114,6 +114,17 @@
                                 </goals>
                                 <configuration>
                                     <enableHttpUrlHandler>true</enableHttpUrlHandler>
+                                    <additionalBuildArgs>
+                                        <additionalBuildArg>-J-Dvertx.disableHttpHeadersValidation=true</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dvertx.disableMetrics=true</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dhibernate.allow_update_outside_transaction=true</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dvertx.disableH2c=true</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dvertx.disableWebsockets=true</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dvertx.flashPolicyHandler=false</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dvertx.threadChecks=false</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dvertx.disableContextTimings=true</additionalBuildArg>
+                                        <additionalBuildArg>-J-Dvertx.disableTCCL=true</additionalBuildArg>
+                                    </additionalBuildArgs>
                                 </configuration>
                             </execution>
                         </executions>

@@ -1,11 +1,11 @@
 package io.quarkus.benchmark.resource;
 
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,28 +28,35 @@ public class DbResource {
     @GET
     @Path("/db")
     public World db() {
-        return randomWorld();
+        return randomWorldForRead();
     }
 
     @GET
     @Path("/queries")
     public World[] queries(@QueryParam("queries") String queries) {
-        World[] worlds = new World[parseQueryCount(queries)];
-        Arrays.setAll(worlds, i -> randomWorld());
+        final int count = parseQueryCount(queries);
+        World[] worlds = randomWorldForRead(count).toArray(new World[0]);
         return worlds;
     }
 
     @GET
     @Path("/updates")
+    //Rules: https://github.com/TechEmpower/FrameworkBenchmarks/wiki/Project-Information-Framework-Tests-Overview#database-updates
+    //N.B. the benchmark seems to be designed to get in deadlocks when using a "safe pattern" of updating
+    // the entity within the same transaction as the one which read it.
+    // We therefore need to do a "read then write" while relinquishing the transaction between the two operations, as
+    // all other tested frameworks seem to do.
     public World[] updates(@QueryParam("queries") String queries) {
-        World[] worlds = new World[parseQueryCount(queries)];
-        Arrays.setAll(worlds, i -> {
-            World world = randomWorld();
-            world.setRandomNumber(randomWorldNumber());
-            return world;
-        });
-
-        return worlds;
+        final int count = parseQueryCount(queries);
+        final Collection<World> worlds = randomWorldForRead(count);
+        worlds.forEach( w -> {
+            //Read the one field, as required by the rules (odd??)
+            final int previousRead = w.getRandomNumber();
+            //Update it
+            w.setRandomNumber( randomWorldNumber() );
+        } );
+        worldRepository.updateAll(worlds);
+        return worlds.toArray(new World[0]);
     }
 
     @GET
@@ -59,8 +66,16 @@ public class DbResource {
         return "OK";
     }
 
-    private World randomWorld() {
-        return worldRepository.find(randomWorldNumber());
+    private World randomWorldForRead() {
+        return worldRepository.findSingleAndStateless(randomWorldNumber());
+    }
+
+    private Collection<World> randomWorldForRead(int count) {
+        Set<Integer> ids = new HashSet<>(count);
+        for (int i=0; i<count; i++) {
+            ids.add(Integer.valueOf(randomWorldNumber()));
+        }
+        return worldRepository.findReadonly(ids);
     }
 
     private int randomWorldNumber() {
