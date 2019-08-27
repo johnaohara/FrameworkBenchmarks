@@ -3,7 +3,8 @@
 This is the Quarkus portion of a [benchmarking test suite](../) comparing a variety of web development platforms.
 
 There is currently one repository implementation.
-* [WorldRepository](src/main/java/io/quarkus/benchmark/repository/WorldRepository.java) is using JPA.
+* [WorldRepository](src/main/java/io/quarkus/benchmark/repository/WorldRepository.java) is using Hibernate ORM,
+the reference JPA implementation for Quarkus.
 
 ### Plaintext Test
 
@@ -31,8 +32,8 @@ There is currently one repository implementation.
 
 ## Versions
 
-* [Java OpenJDK 11](http://openjdk.java.net/)
-* [Quarkus 0.16.0](https://quarkus.io)
+* [Java OpenJDK 8](http://openjdk.java.net/) - JDK 8 compatible, but the docker image is using JDK11.
+* [Quarkus TBD](https://quarkus.io) - currently using a snapshot build
 
 ## Test URLs
 
@@ -59,3 +60,26 @@ There is currently one repository implementation.
 ### Template rendering Test
 
     http://localhost:8080/fortunes
+
+# External testing
+
+During development it might be easier to start a PostgreSQL instance directly:
+
+    sudo podman run --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 --name HibernateTestingPGSQL -e POSTGRES_USER=benchmarkdbuser -e POSTGRES_PASSWORD=benchmarkdbpass -e POSTGRES_DB=hello_world -p 5432:5432 postgres:11
+
+Then edit the `application.properties` resource, so to point to the database on localhost.
+
+Build the application
+
+    mvn clean package
+
+Run the application
+
+    ./start-app.sh
+
+Generate load on the application:
+
+     ~/sources/wrk2/wrk -c 100 -d 60 -R 400 http://localhost:8080/db
+
+(or any of the other URLs meaningful for the benchmark)
+
