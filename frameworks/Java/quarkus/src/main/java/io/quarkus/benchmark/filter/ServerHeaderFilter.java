@@ -3,15 +3,16 @@ package io.quarkus.benchmark.filter;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
 import io.quarkus.scheduler.Scheduled;
 
-@ApplicationScoped
+@Singleton
 @Provider
 public class ServerHeaderFilter implements ContainerResponseFilter {
 
@@ -29,7 +30,8 @@ public class ServerHeaderFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-        responseContext.getHeaders().add("Server", "Quarkus");
-        responseContext.getHeaders().add("Date", date);
+        final MultivaluedMap<String, Object> headers = responseContext.getHeaders();
+        headers.add( "Server", "Quarkus");
+        headers.add( "Date", date);
     }
 }
