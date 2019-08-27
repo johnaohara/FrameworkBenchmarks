@@ -1,5 +1,6 @@
 package io.quarkus.benchmark.resource;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.ws.rs.GET;
@@ -11,10 +12,11 @@ import javax.ws.rs.core.MediaType;
 public class JsonResource {
     private static final String MESSAGE = "message";
     private static final String HELLO = "Hello, World!";
+    private static final Map<String, String> map = Collections.singletonMap( MESSAGE, HELLO );
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> json() {
-        return Map.of(MESSAGE, HELLO);
+        return map;
     }
 }

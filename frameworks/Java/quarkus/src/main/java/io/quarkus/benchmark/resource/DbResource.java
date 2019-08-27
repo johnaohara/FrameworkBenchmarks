@@ -34,7 +34,7 @@ public class DbResource {
     @GET
     @Path("/queries")
     public World[] queries(@QueryParam("queries") String queries) {
-        var worlds = new World[parseQueryCount(queries)];
+        World[] worlds = new World[parseQueryCount(queries)];
         Arrays.setAll(worlds, i -> randomWorld());
         return worlds;
     }
@@ -42,7 +42,7 @@ public class DbResource {
     @GET
     @Path("/updates")
     public World[] updates(@QueryParam("queries") String queries) {
-        var worlds = new World[parseQueryCount(queries)];
+        World[] worlds = new World[parseQueryCount(queries)];
         Arrays.setAll(worlds, i -> {
             World world = randomWorld();
             world.setRandomNumber(randomWorldNumber());
