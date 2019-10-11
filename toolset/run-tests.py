@@ -194,7 +194,7 @@ def main(argv=None):
     parser.add_argument(
         '--cpu-count',
         default=None,
-        help='The network mode to run docker in')
+        help='The number of cpus to run framework container on')
 
     args = parser.parse_args()
 
