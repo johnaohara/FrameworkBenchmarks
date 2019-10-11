@@ -190,6 +190,12 @@ def main(argv=None):
         default=None,
         help='The network mode to run docker in')
 
+    #CU options
+    parser.add_argument(
+        '--cpu-count',
+        default=None,
+        help='The network mode to run docker in')
+
     args = parser.parse_args()
 
     config = BenchmarkConfig(args)
