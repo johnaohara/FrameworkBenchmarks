@@ -198,6 +198,11 @@ class DockerHelper:
                 'soft': 99
             }]
 
+            cpu_count = ''
+
+            if self.benchmarker.config.cpu_count is not None:
+                cpu_count = self.benchmarker.config.cpu_count
+
             docker_cmd = ''
             if hasattr(test, 'docker_cmd'):
                 docker_cmd = test.docker_cmd
@@ -223,7 +228,8 @@ class DockerHelper:
                 mem_limit=mem_limit,
                 sysctls=sysctl,
                 remove=True,
-                log_config={'type': None})
+                log_config={'type': None},
+                cpu_count=cpu_count)
 
             watch_thread = Thread(
                 target=watch_container,
