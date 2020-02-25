@@ -223,7 +223,8 @@ class DockerHelper:
                 mem_limit=mem_limit,
                 sysctls=sysctl,
                 remove=True,
-                log_config={'type': None})
+                log_config={'type': None},
+                volumes={'/tmp/': {'bind': '/logs', 'mode': 'rw'}})
 
             watch_thread = Thread(
                 target=watch_container,
