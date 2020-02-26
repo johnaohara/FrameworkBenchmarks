@@ -284,11 +284,11 @@ class DockerHelper:
                 DockerHelper.__stop_all(self.database)
                 DockerHelper.__stop_all(self.client)
 
-        self.database.containers.prune()
+#         self.database.containers.prune()
         if is_multi_setup:
             # Then we're on a 3 machine set up
-            self.server.containers.prune()
-            self.client.containers.prune()
+#             self.server.containers.prune()
+#             self.client.containers.prune()
 
     def build_databases(self):
         '''
