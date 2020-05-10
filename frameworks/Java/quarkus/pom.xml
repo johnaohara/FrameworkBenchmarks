@@ -21,7 +21,7 @@
         <module>pgclient-mutiny</module>
         <module>pgclient-mutiny-iterator</module>
         <module>pgclient-reactiverse</module>
-        <module>pgclient-reactiversei-custom-pool</module>
+        <module>pgclient-reactiverse-custom-pool</module>
     </modules>
 
     <dependencyManagement>
