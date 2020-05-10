@@ -2,6 +2,7 @@ FROM maven:3.6.3-jdk-11-slim as maven
 WORKDIR /quarkus
 COPY pom.xml pom.xml
 COPY base/pom.xml base/pom.xml
+COPY hibernate/pom.xml hibernate/pom.xml
 COPY pgclient/pom.xml  pgclient/pom.xml
 COPY pgclientMutiny/pom.xml  pgclientMutiny/pom.xml
 COPY pgclientMutinyIterator/pom.xml  pgclientMutinyIterator/pom.xml
