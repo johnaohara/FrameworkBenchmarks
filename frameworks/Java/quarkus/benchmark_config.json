@@ -87,7 +87,7 @@
 	}
       },
       {
-      "pgclientMutinyIterator": {
+      "pgclient-mutiny-iterator": {
         "db_url": "/pgclient/db",
         "query_url": "/pgclient/queries?queries=",
         "update_url": "/pgclient/updates?queries=",
@@ -104,13 +104,13 @@
         "webserver": "None",
         "os": "Linux",
         "database_os": "Linux",
-        "display_name": "quarkus-pgclient",
+        "display_name": "quarkus-pgclient-mutiny-iterator",
         "notes": "",
         "versus": "Netty"
 	}
       },
       {
-      "pgclientReactiverse": {
+      "pgclient-reactiverse": {
         "db_url": "/pgclient/db",
         "query_url": "/pgclient/queries?queries=",
         "update_url": "/pgclient/updates?queries=",
@@ -127,13 +127,13 @@
         "webserver": "None",
         "os": "Linux",
         "database_os": "Linux",
-        "display_name": "quarkus-pgclient",
+        "display_name": "quarkus-pgclient-reactiverse",
         "notes": "",
         "versus": "Netty"
 	}
       },
       {
-      "pgclientReactiverseCustomPool": {
+      "pgclient-reactiverse-custom-pool": {
         "db_url": "/pgclient/db",
         "query_url": "/pgclient/queries?queries=",
         "update_url": "/pgclient/updates?queries=",
@@ -150,7 +150,7 @@
         "webserver": "None",
         "os": "Linux",
         "database_os": "Linux",
-        "display_name": "quarkus-pgclient",
+        "display_name": "quarkus-pgclient-reactiverse-custom-pool",
         "notes": "",
         "versus": "Netty"
       }

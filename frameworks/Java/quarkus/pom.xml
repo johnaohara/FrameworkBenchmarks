@@ -19,9 +19,9 @@
         <module>hibernate</module>
         <module>pgclient</module>
         <module>pgclient-mutiny</module>
-        <module>pgclientMutinyIterator</module>
-        <module>pgclientReactiverse</module>
-        <module>pgclientReactiverseCustomPool</module>
+        <module>pgclient-mutiny-iterator</module>
+        <module>pgclient-reactiverse</module>
+        <module>pgclient-reactiversei-custom-pool</module>
     </modules>
 
     <dependencyManagement>

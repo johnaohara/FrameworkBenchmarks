@@ -5,17 +5,17 @@ COPY base/pom.xml base/pom.xml
 COPY hibernate/pom.xml hibernate/pom.xml
 COPY pgclient/pom.xml  pgclient/pom.xml
 COPY pgclient-mutiny/pom.xml  pgclient-mutiny/pom.xml
-COPY pgclientMutinyIterator/pom.xml  pgclientMutinyIterator/pom.xml
-COPY pgclientReactiverse/pom.xml pgclientReactiverse/pom.xml
-COPY pgclientReactiverseCustomPool/pom.xml pgclientReactiverseCustomPool/pom.xml
+COPY pgclient-mutiny-iterator/pom.xml  pgclient-mutiny-iterator/pom.xml
+COPY pgclient-reactiverse/pom.xml pgclient-reactiverse/pom.xml
+COPY pgclient-reactiverse-custom-pool/pom.xml pgclient-reactiverse-custom-pool/pom.xml
 RUN mvn dependency:go-offline -q -pl base
 COPY base/src base/src
 COPY hibernate/src hibernate/src
 COPY pgclient/src pgclient/src
 COPY pgclient-mutiny/src pgclient-mutiny/src
-COPY pgclientMutinyIterator/src pgclientMutinyIterator/src
-COPY pgclientReactiverse/src pgclientReactiverse/src
-COPY pgclientReactiverseCustomPool/src pgclientReactiverseCustomPool/src
+COPY pgclient-mutiny-iterator/src pgclient-mutiny-iterator/src
+COPY pgclient-reactiverse/src pgclient-reactiverse/src
+COPY pgclient-reactiverse-custom-pool/src pgclient-reactiverse-custom-pool/src
 RUN mvn package -q -pl  pgclient-mutiny -am
 
 FROM openjdk:11.0.6-jdk-slim
