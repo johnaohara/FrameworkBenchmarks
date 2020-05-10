@@ -14,8 +14,8 @@ COPY hibernate/src hibernate/src
 COPY pgclient/src pgclient/src
 COPY pgclient-mutiny/src pgclient-mutiny/src
 COPY pgclient-mutiny-iterator/src pgclient-mutiny-iterator/src
-COPY pgclientReactiverse/src pgclientReactiverse/src
-COPY pgclientReactiverseCustomPool/src pgclientReactiverseCustomPool/src
+COPY pgclient-reactiverse/src pgclient-reactiverse/src
+COPY pgclient-reactiverse-custom-pool/src pgclient-reactiverse-custom-pool/src
 
 RUN mvn package -q -pl pgclient -am
 
