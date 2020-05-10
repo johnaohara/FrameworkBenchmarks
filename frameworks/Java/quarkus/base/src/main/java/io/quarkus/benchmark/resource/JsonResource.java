@@ -1,22 +1,31 @@
 package io.quarkus.benchmark.resource;
 
+import io.quarkus.vertx.web.Route;
+import io.quarkus.vertx.web.RoutingExchange;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import org.apache.http.HttpHeaders;
+
+import javax.inject.Singleton;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-@Path("/json")
-public class JsonResource {
+@Singleton
+public class JsonResource extends BaseResource {
     private static final String MESSAGE = "message";
     private static final String HELLO = "Hello, World!";
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public CompletionStage<Map<String, String>> json() {
-        return CompletableFuture.supplyAsync(() -> Map.of(MESSAGE, HELLO));
+    @Route(path = "/json", methods = HttpMethod.GET)
+    public void json(final RoutingExchange exchange) {
+
+        exchange.ok()
+                .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                .putHeader(HttpHeaders.SERVER, SERVER)
+                .putHeader(HttpHeaders.DATE, date)
+                .end(
+                        JsonObject
+                                .mapFrom(Map.of(MESSAGE, HELLO))
+                                .toString()
+                );
+
     }
 }
