@@ -20,7 +20,7 @@ public class BaseResource {
     }
 
     @Scheduled(every="1s")
-    void increment() {
+    public void increment() {
         date = DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now());
     }
 
