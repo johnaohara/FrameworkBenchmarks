@@ -61,6 +61,98 @@
         "display_name": "quarkus-pgclient",
         "notes": "",
         "versus": "Netty"
+	}
+      },
+      {
+      "pgclientMutiny": {
+        "db_url": "/pgclient/db",
+        "query_url": "/pgclient/queries?queries=",
+        "update_url": "/pgclient/updates?queries=",
+        "fortune_url": "/pgclient/fortunes",
+        "port": 8080,
+        "approach": "Realistic",
+        "classification": "fullstack",
+        "database": "Postgres",
+        "framework": "Quarkus",
+        "language": "Java",
+        "flavor": "None",
+        "orm": "Micro",
+        "platform": "JAX-RS",
+        "webserver": "None",
+        "os": "Linux",
+        "database_os": "Linux",
+        "display_name": "quarkus-pgclient",
+        "notes": "",
+        "versus": "Netty"
+	}
+      },
+      {
+      "pgclientMutinyIterator": {
+        "db_url": "/pgclient/db",
+        "query_url": "/pgclient/queries?queries=",
+        "update_url": "/pgclient/updates?queries=",
+        "fortune_url": "/pgclient/fortunes",
+        "port": 8080,
+        "approach": "Realistic",
+        "classification": "fullstack",
+        "database": "Postgres",
+        "framework": "Quarkus",
+        "language": "Java",
+        "flavor": "None",
+        "orm": "Micro",
+        "platform": "JAX-RS",
+        "webserver": "None",
+        "os": "Linux",
+        "database_os": "Linux",
+        "display_name": "quarkus-pgclient",
+        "notes": "",
+        "versus": "Netty"
+	}
+      },
+      {
+      "pgclientReactiverse": {
+        "db_url": "/pgclient/db",
+        "query_url": "/pgclient/queries?queries=",
+        "update_url": "/pgclient/updates?queries=",
+        "fortune_url": "/pgclient/fortunes",
+        "port": 8080,
+        "approach": "Realistic",
+        "classification": "fullstack",
+        "database": "Postgres",
+        "framework": "Quarkus",
+        "language": "Java",
+        "flavor": "None",
+        "orm": "Micro",
+        "platform": "JAX-RS",
+        "webserver": "None",
+        "os": "Linux",
+        "database_os": "Linux",
+        "display_name": "quarkus-pgclient",
+        "notes": "",
+        "versus": "Netty"
+	}
+      },
+      {
+      "pgclientReactiverseCustomPool": {
+        "db_url": "/pgclient/db",
+        "query_url": "/pgclient/queries?queries=",
+        "update_url": "/pgclient/updates?queries=",
+        "fortune_url": "/pgclient/fortunes",
+        "port": 8080,
+        "approach": "Realistic",
+        "classification": "fullstack",
+        "database": "Postgres",
+        "framework": "Quarkus",
+        "language": "Java",
+        "flavor": "None",
+        "orm": "Micro",
+        "platform": "JAX-RS",
+        "webserver": "None",
+        "os": "Linux",
+        "database_os": "Linux",
+        "display_name": "quarkus-pgclient",
+        "notes": "",
+        "versus": "Netty"
       }
     }
   ]

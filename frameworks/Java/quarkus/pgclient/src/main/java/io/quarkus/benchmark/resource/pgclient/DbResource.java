@@ -1,86 +1,127 @@
 package io.quarkus.benchmark.resource.pgclient;
 
-import java.util.Arrays;
+import io.quarkus.benchmark.model.World;
+import io.quarkus.benchmark.resource.BaseResource;
+import io.quarkus.vertx.web.Route;
+import io.quarkus.vertx.web.RoutingExchange;
+import io.smallrye.mutiny.Uni;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Tuple;
+import org.apache.http.HttpStatus;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+@Singleton
+public class DbResource extends BaseResource {
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+    private static final String UPDATE_WORLD = "UPDATE world SET randomnumber=$1 WHERE id=$2";
+    private static final String SELECT_WORLD = "SELECT id, randomnumber from WORLD where id=$1";
+    private static final String SELECT_FORTUNE = "SELECT id, message from FORTUNE";
 
-import io.quarkus.benchmark.model.World;
-import io.quarkus.benchmark.repository.pgclient.WorldRepository;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
-
-@ApplicationScoped
-@Path("/pgclient")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class DbResource {
-
-    private static Logger LOG = LoggerFactory.getLogger(WorldRepository.class);
+    private static final String SERVER_ERROR = "Error Occurred: ";
+    private static final String BAD_REQUEST = "Bad Request";
 
     @Inject
-    WorldRepository worldRepository;
+    PgPool pgPool;
 
-    @GET
-    @Path("/db")
-    public CompletionStage<World> db() {
-        return randomWorld()
-                .to(m -> {
-                    CompletableFuture<World> cf = new CompletableFuture<>();
-                    m.subscribe(cf::complete, cf::completeExceptionally, () -> cf.complete(null));
-                    return cf;
-                });
+
+    @Route(path = "/pgclient/db", methods = HttpMethod.GET)
+    public void db(final RoutingExchange routingExchange) {
+
+        pgPool.preparedQuery(SELECT_WORLD, Tuple.of(randomWorldNumber()))
+                .map(rows -> rows.iterator().next())
+                .onItem().produceUni(row -> Uni.createFrom().item(World.from(row))).subscribe()
+                .with(
+                        world -> routingExchange.ok()
+                                .putHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                                .putHeader(org.apache.http.HttpHeaders.SERVER, SERVER)
+                                .putHeader(org.apache.http.HttpHeaders.DATE, date)
+                                .end(JsonObject.mapFrom(world).toString()),
+
+                        failure -> routingExchange.response()
+                                .setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                                .putHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                                .putHeader(org.apache.http.HttpHeaders.SERVER, SERVER)
+                                .putHeader(org.apache.http.HttpHeaders.DATE, date)
+                                .end(SERVER_ERROR.concat(failure.getMessage()))
+                );
+
     }
 
-    @GET
-    @Path("/queries")
-    public CompletionStage<List<World>> queries(@QueryParam("queries") String queries) {
-        Maybe<World>[] worlds = new Maybe[parseQueryCount(queries)];
-        Arrays.setAll(worlds, i -> randomWorld());
 
-        return Maybe.concatArray(worlds)
-                .toList()
-                .to(m -> {
-                    CompletableFuture<List<World>> cf = new CompletableFuture<>();
-                    m.subscribe(cf::complete, cf::completeExceptionally);
-                    return cf;
-                });
+    @Route(path = "/pgclient/queries", methods = HttpMethod.GET)
+    public void queries(final RoutingExchange routingExchange) {
+
+        Optional<String> queries = routingExchange.getParam("queries");
+        if (queries.isPresent()) {
+
+            final int count = parseQueryCount(queries.get());
+
+            routingExchange.ok()
+                    .putHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                    .putHeader(org.apache.http.HttpHeaders.SERVER, SERVER)
+                    .putHeader(org.apache.http.HttpHeaders.DATE, date)
+                    .end(JsonObject.mapFrom(JsonObject.mapFrom(randomWorldForRead(count))).toString());
+
+        } else { //Missing queries param
+            routingExchange.response()
+                    .setStatusCode(HttpStatus.SC_BAD_REQUEST)
+                    .putHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                    .putHeader(org.apache.http.HttpHeaders.SERVER, SERVER)
+                    .putHeader(org.apache.http.HttpHeaders.DATE, date)
+                    .end(BAD_REQUEST);
+        }
+
     }
 
-    @GET
-    @Path("/updates")
-    public CompletionStage<List<World>> updates(@QueryParam("queries") String queries) {
-        Single<World>[] worlds = new Single[parseQueryCount(queries)];
-        Arrays.setAll(worlds, i -> randomWorld().flatMapSingle(world -> {
-            world.setId(randomWorldNumber());
-            return worldRepository.update(world);
-        }));
+    //
+//    @GET
+//    @Path("/updates")
+    @Route(path = "/pgclient/updates", methods = HttpMethod.GET)
+    public void updates(final RoutingExchange routingExchange) {
 
-        return Single.concatArray(worlds)
-                .toList()
-                .to(m -> {
-                    CompletableFuture<List<World>> cf = new CompletableFuture<>();
-                    m.subscribe(cf::complete, cf::completeExceptionally);
-                    return cf;
-                });
-    }
+        Optional<String> query = routingExchange.getParam("query");
+        if (query.isPresent()) {
 
-    private Maybe<World> randomWorld() {
-        return worldRepository.find(randomWorldNumber());
+            final int count = parseQueryCount(query.get());
+
+            routingExchange.ok()
+                    .putHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                    .putHeader(org.apache.http.HttpHeaders.SERVER, SERVER)
+                    .putHeader(org.apache.http.HttpHeaders.DATE, date)
+                    .end(JsonObject.mapFrom(JsonObject.mapFrom(randomWorldForRead(count))).toString());
+
+        } else { //Missing queries param
+            routingExchange.response()
+                    .setStatusCode(HttpStatus.SC_BAD_REQUEST)
+                    .putHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                    .putHeader(org.apache.http.HttpHeaders.SERVER, SERVER)
+                    .putHeader(org.apache.http.HttpHeaders.DATE, date)
+                    .end(BAD_REQUEST);
+        }
     }
+//    public CompletionStage<List<World>> updates(@QueryParam("queries") String queries) {
+//        Single<World>[] worlds = new Single[parseQueryCount(queries)];
+//        Arrays.setAll(worlds, i -> randomWorld().flatMapSingle(world -> {
+//            world.setId(randomWorldNumber());
+//            return worldRepository.update(world);
+//        }));
+//
+//        return Single.concatArray(worlds)
+//                .toList()
+//                .to(m -> {
+//                    CompletableFuture<List<World>> cf = new CompletableFuture<>();
+//                    m.subscribe(cf::complete, cf::completeExceptionally);
+//                    return cf;
+//                });
+//    }
 
     private int randomWorldNumber() {
         return 1 + ThreadLocalRandom.current().nextInt(10000);
@@ -98,4 +139,60 @@ public class DbResource {
         }
         return Math.min(500, Math.max(1, parsedValue));
     }
+
+
+    private World[] randomWorldForRead(int count) {
+
+        //TODO:: validate speed of collection operations
+        List<Integer> ids = new ArrayList<>(count);
+        int counter = 0;
+        while (counter < count) {
+            counter += ids.add(randomWorldNumber()) ? 1 : 0; //Make sure each random world is unique
+        }
+
+        final World[] worlds = new World[count];
+
+//        for (int i = 0; i < count; i++) {
+//
+//            int finalI = i;
+//            fetchWorld(ids.get(i)).subscribe().with(
+//                    world -> worlds[finalI] = world,
+//                    failure -> failure.printStackTrace()
+//            );
+//
+//        }
+//
+//        Uni<String> stringUni = pgPool.begin().flatMap(
+//                transaction -> {
+//                    Uni<RowSet<Row>> rowSetUni = transaction.query("SELECT 1");
+//                    ids.iterator().forEachRemaining(idTuple -> rowSetUni.and(transaction.preparedQuery(SELECT_WORLD, Tuple.of(idTuple))));
+//                    rowSetUni.onItem().produceUni(rows -> {
+//                        transaction.commitAndForget();
+//                        return Uni.createFrom().item("Test");
+//                    });
+
+
+
+//        Uni<Transaction> transactionUni = pgPool.begin();
+//
+//        transactionUni.flatMap( tx -> {
+//            ids.iterator().forEachRemaining( idTuple -> tx.preparedQuery(SELECT_WORLD, idTuple) );
+//
+//        });
+//
+//
+//        pgPool.preparedBatch(SELECT_WORLD, ids).subscribe().with(
+//                rows -> rows.iterator().forEachRemaining( row -> worlds.add(World.from(row))),
+//                failure -> failure.printStackTrace()
+//        );
+
+        return worlds;
+    }
+
+    private Uni<World> fetchWorld(int id) {
+        return pgPool.preparedQuery(SELECT_WORLD, Tuple.of(id))
+                .map(rows -> rows.iterator().next())
+                .onItem().produceUni(row -> Uni.createFrom().item(World.from(row)));
+    }
+
 }

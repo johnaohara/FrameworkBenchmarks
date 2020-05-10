@@ -18,6 +18,10 @@
         <module>base</module>
         <module>hibernate</module>
         <module>pgclient</module>
+        <module>pgclientMutiny</module>
+        <module>pgclientMutinyIterator</module>
+        <module>pgclientReactiverse</module>
+        <module>pgclientReactiverseCustomPool</module>
     </modules>
 
     <dependencyManagement>
