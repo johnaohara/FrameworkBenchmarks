@@ -8,7 +8,6 @@ CMD java \
     -server                                           \
     -XX:+UseNUMA                                      \
     -XX:+UseParallelGC                                \
-    -XX:+AggressiveOpts                               \
     -Dvertx.disableMetrics=true                       \
     -Dvertx.disableH2c=true                           \
     -Dvertx.disableWebsockets=true                    \
