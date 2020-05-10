@@ -61,7 +61,7 @@ public class DbReactiverseResource extends BaseResource {
         options.setUser("benchmarkdbuser");
         options.setPassword("benchmarkdbpass");
         options.setCachePreparedStatements(true);
-        client = PgClient.pool(vertx, new PgPoolOptions(options).setMaxSize(4));
+        client = PgClient.pool(vertx, new PgPoolOptions(options).setMaxSize(32));
     }
 
 
