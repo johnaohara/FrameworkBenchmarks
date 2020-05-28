@@ -18,6 +18,7 @@ COPY pgclient-mutiny-iterator/src pgclient-mutiny-iterator/src
 COPY pgclient-reactiverse/src pgclient-reactiverse/src
 COPY pgclient-reactiverse-custom-pool/src pgclient-reactiverse-custom-pool/src
 COPY pgclient-reactiverse-thread-local/src pgclient-reactiverse-thread-local/src
+
 RUN mvn package -q -pl pgclient-reactiverse-thread-local -am
 
 FROM openjdk:11.0.6-jdk-slim
