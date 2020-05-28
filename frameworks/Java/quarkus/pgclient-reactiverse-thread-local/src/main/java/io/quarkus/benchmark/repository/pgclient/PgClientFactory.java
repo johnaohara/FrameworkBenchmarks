@@ -1,16 +1,21 @@
 package io.quarkus.benchmark.repository.pgclient;
 
-import io.vertx.mutiny.core.Vertx;
-import io.vertx.mutiny.pgclient.PgPool;
-import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.sqlclient.PoolOptions;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import io.vertx.axle.core.Vertx;
+import io.vertx.axle.pgclient.PgPool;
+import io.vertx.axle.sqlclient.SqlClient;
+import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.sqlclient.PoolOptions;
 
 @ApplicationScoped
 public class PgClientFactory {

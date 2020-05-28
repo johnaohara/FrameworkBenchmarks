@@ -17,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 
 import io.quarkus.benchmark.model.World;
 import io.quarkus.benchmark.repository.pgclient.WorldRepository;
-import io.smallrye.mutiny.Uni;
 
 
 @ApplicationScoped
@@ -31,7 +30,7 @@ public class DbResource {
 
     @GET
     @Path("/db")
-    public Uni<World> db() {
+    public CompletionStage<World> db() {
         return randomWorld();
     }
 
@@ -41,7 +40,7 @@ public class DbResource {
         var worlds = new CompletableFuture[parseQueryCount(queries)];
         var ret = new World[worlds.length];
         Arrays.setAll(worlds, i -> {
-            return randomWorld().subscribeAsCompletionStage().thenApply(w -> ret[i] = w);
+            return randomWorld().thenApply(w -> ret[i] = w);
         });
 
         return CompletableFuture.allOf(worlds).thenApply(v -> Arrays.asList(ret));
@@ -53,17 +52,17 @@ public class DbResource {
         var worlds = new CompletableFuture[parseQueryCount(queries)];
         var ret = new World[worlds.length];
         Arrays.setAll(worlds, i -> {
-            return randomWorld().subscribeAsCompletionStage().thenApply(w -> {
+            return randomWorld().thenApply(w -> {
                 w.setRandomNumber(randomWorldNumber());
                 ret[i] = w;
                 return w;
             });
         });
 
-        return CompletableFuture.allOf(worlds).thenCompose(v -> worldRepository.update(ret).subscribeAsCompletionStage()).thenApply(v -> Arrays.asList(ret));
+        return CompletableFuture.allOf(worlds).thenCompose(v -> worldRepository.update(ret)).thenApply(v -> Arrays.asList(ret));
     }
 
-    private Uni<World> randomWorld() {
+    private CompletionStage<World> randomWorld() {
         return worldRepository.find(randomWorldNumber());
     }
 

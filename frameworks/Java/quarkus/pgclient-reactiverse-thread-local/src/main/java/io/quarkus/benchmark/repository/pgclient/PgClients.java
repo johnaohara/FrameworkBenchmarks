@@ -1,7 +1,12 @@
 package io.quarkus.benchmark.repository.pgclient;
 
-import io.vertx.mutiny.pgclient.PgPool;
-import io.vertx.mutiny.sqlclient.SqlClient;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.stream.Stream;
+
+import io.vertx.axle.core.Vertx;
+import io.vertx.axle.pgclient.PgPool;
+import io.vertx.axle.sqlclient.SqlClient;
 
 class PgClients {
     private ThreadLocal<SqlClient> sqlClient = new ThreadLocal<>();
