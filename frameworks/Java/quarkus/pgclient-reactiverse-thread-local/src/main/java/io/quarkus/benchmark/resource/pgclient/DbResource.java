@@ -21,7 +21,7 @@ public class DbResource  extends BaseResource {
     @Inject
     WorldRepository worldRepository;
 
-    @Route(path = "/pgclient/db", methods = HttpMethod.GET)
+    @Route(path = "/db", methods = HttpMethod.GET)
     public void db(final RoutingContext ctx) {
         randomWorld().thenAccept( world -> {
             ctx.response()
