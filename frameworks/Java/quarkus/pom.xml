@@ -22,7 +22,7 @@
         <module>pgclient-mutiny-iterator</module>
         <module>pgclient-reactiverse</module>
         <module>pgclient-reactiverse-custom-pool</module>
-<!--        <module>pgclient-reactiverse-thread-local</module>-->
+        <module>pgclient-reactiverse-thread-local</module>
     </modules>
 
     <dependencyManagement>
