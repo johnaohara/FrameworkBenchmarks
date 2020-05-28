@@ -1,66 +1,73 @@
 package io.quarkus.benchmark.resource.pgclient;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ThreadLocalRandom;
+import io.quarkus.benchmark.model.World;
+import io.quarkus.benchmark.repository.pgclient.WorldRepository;
+import io.quarkus.benchmark.resource.BaseResource;
+import io.quarkus.vertx.web.Route;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.Json;
+import io.vertx.ext.web.RoutingContext;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
-import io.quarkus.benchmark.model.World;
-import io.quarkus.benchmark.repository.pgclient.WorldRepository;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @ApplicationScoped
-@Path("/")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class DbResource {
+public class DbResource  extends BaseResource {
 
     @Inject
     WorldRepository worldRepository;
 
-    @GET
-    @Path("/db")
-    public CompletionStage<World> db() {
-        return randomWorld();
-    }
-
-    @GET
-    @Path("/queries")
-    public CompletionStage<List<World>> queries(@QueryParam("queries") String queries) {
-        var worlds = new CompletableFuture[parseQueryCount(queries)];
-        var ret = new World[worlds.length];
-        Arrays.setAll(worlds, i -> {
-            return randomWorld().thenApply(w -> ret[i] = w);
+    @Route(path = "/pgclient/db", methods = HttpMethod.GET)
+    public void db(final RoutingContext ctx) {
+        randomWorld().thenAccept( world -> {
+            ctx.response()
+                    .putHeader(HttpHeaders.SERVER, SERVER)
+                    .putHeader(HttpHeaders.DATE, date)
+                    .putHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                    .end(Json.encodeToBuffer(world));
+        }).exceptionally( err -> {
+            ctx.response()
+                    .setStatusCode(404)
+                    .end();
+            return null;
         });
-
-        return CompletableFuture.allOf(worlds).thenApply(v -> Arrays.asList(ret));
     }
 
-    @GET
-    @Path("/updates")
-    public CompletionStage<List<World>> updates(@QueryParam("queries") String queries) {
-        var worlds = new CompletableFuture[parseQueryCount(queries)];
-        var ret = new World[worlds.length];
-        Arrays.setAll(worlds, i -> {
-            return randomWorld().thenApply(w -> {
-                w.setRandomNumber(randomWorldNumber());
-                ret[i] = w;
-                return w;
-            });
-        });
-
-        return CompletableFuture.allOf(worlds).thenCompose(v -> worldRepository.update(ret)).thenApply(v -> Arrays.asList(ret));
-    }
+//    @GET
+//    @Path("/queries")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public CompletionStage<List<World>> queries(@QueryParam("queries") String queries) {
+//        var worlds = new CompletableFuture[parseQueryCount(queries)];
+//        var ret = new World[worlds.length];
+//        Arrays.setAll(worlds, i -> {
+//            return randomWorld().thenApply(w -> ret[i] = w);
+//        });
+//
+//        return CompletableFuture.allOf(worlds).thenApply(v -> Arrays.asList(ret));
+//    }
+//
+//    @GET
+//    @Path("/updates")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public CompletionStage<List<World>> updates(@QueryParam("queries") String queries) {
+//        var worlds = new CompletableFuture[parseQueryCount(queries)];
+//        var ret = new World[worlds.length];
+//        Arrays.setAll(worlds, i -> {
+//            return randomWorld().thenApply(w -> {
+//                w.setRandomNumber(randomWorldNumber());
+//                ret[i] = w;
+//                return w;
+//            });
+//        });
+//
+//        return CompletableFuture.allOf(worlds).thenCompose(v -> worldRepository.update(ret)).thenApply(v -> Arrays.asList(ret));
+//    }
 
     private CompletionStage<World> randomWorld() {
         return worldRepository.find(randomWorldNumber());
