@@ -157,10 +157,10 @@
     },
     {
       "pgclient-reactiverse-thread-local": {
-        "db_url": "/pgclient/db",
-        "query_url": "/pgclient/queries?queries=",
-        "update_url": "/pgclient/updates?queries=",
-        "fortune_url": "/pgclient/fortunes",
+        "db_url": "/db",
+        "query_url": "/queries?queries=",
+        "update_url": "/updates?queries=",
+        "fortune_url": "/fortunes",
         "port": 8080,
         "approach": "Realistic",
         "classification": "fullstack",
