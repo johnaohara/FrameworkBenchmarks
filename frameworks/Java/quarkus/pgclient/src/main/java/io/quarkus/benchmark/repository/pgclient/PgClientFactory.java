@@ -9,8 +9,8 @@ import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import io.vertx.axle.core.Vertx;
-import io.vertx.axle.pgclient.PgPool;
+import io.vertx.mutiny.core.Vertx;
+import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 

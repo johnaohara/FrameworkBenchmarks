@@ -3,14 +3,14 @@ package io.quarkus.benchmark.repository.pgclient;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import io.quarkus.benchmark.model.World;
-import io.vertx.axle.sqlclient.Row;
-import io.vertx.axle.sqlclient.Tuple;
+import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.Tuple;
 
 @ApplicationScoped
 public class WorldRepository {
@@ -18,21 +18,21 @@ public class WorldRepository {
     @Inject
     PgClients clients;
 
-    public CompletionStage<World> find(int id) {
+    public Uni<World> find(int id) {
         return clients.getClient().preparedQuery("SELECT * FROM World WHERE id = $1", Tuple.of(id))
-                .thenApply(rowset -> {
+                .map(rowset -> {
                     Row row = rowset.iterator().next();
                     return new World(row.getInteger(0), row.getInteger(1));
                 });
     }
 
-    public CompletionStage<Void> update(World[] worlds) {
+    public Uni<Void> update(World[] worlds) {
         Arrays.sort(worlds);
         List<Tuple> args = new ArrayList<>(worlds.length);
         for(World world : worlds) {
             args.add(Tuple.of(world.getId(), world.getRandomNumber()));
         }
         return clients.getPool().preparedBatch("UPDATE World SET randomNumber = $2 WHERE id = $1", args)
-                .thenApply(v -> null);
+                .map(v -> null);
     }
 }

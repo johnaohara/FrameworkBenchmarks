@@ -1,7 +1,7 @@
 package io.quarkus.benchmark.repository.pgclient;
 
-import io.vertx.axle.pgclient.PgPool;
-import io.vertx.axle.sqlclient.SqlClient;
+import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.SqlClient;
 
 class PgClients {
     private ThreadLocal<SqlClient> sqlClient = new ThreadLocal<>();

@@ -2,13 +2,13 @@ package io.quarkus.benchmark.repository.pgclient;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import io.quarkus.benchmark.model.Fortune;
-import io.vertx.axle.sqlclient.Row;
+import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.sqlclient.Row;
 
 @ApplicationScoped
 public class FortuneRepository {
@@ -16,9 +16,9 @@ public class FortuneRepository {
     @Inject
     PgClients clients;
 
-    public CompletionStage<List<Fortune>> findAll() {
+    public Uni<List<Fortune>> findAll() {
         return clients.getClient().preparedQuery("SELECT * FROM Fortune" )
-                .thenApply(rowset -> {
+                .map(rowset -> {
                     List<Fortune> ret = new ArrayList<>(rowset.size()+1);
                     for(Row r : rowset) {
                         ret.add(new Fortune(r.getInteger("id"), r.getString("message")));

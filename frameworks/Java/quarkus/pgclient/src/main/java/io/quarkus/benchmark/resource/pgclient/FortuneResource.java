@@ -32,13 +32,14 @@ public class FortuneResource extends BaseResource {
     @Route(path = "fortunes")
     public void fortunes(RoutingContext rc) {
         repository.findAll()
-                .thenAccept( fortunes -> {
-                    fortunes.add(new Fortune(0, "Additional fortune added at request time."));
-                    fortunes.sort(Comparator.comparing(fortune -> fortune.getMessage()));
-                    StringWriter writer = new StringWriter();
-                    template.execute(writer, Collections.singletonMap("fortunes", fortunes));
-                    rc.response().putHeader("Content-Type", "text/html;charset=UTF-8");
-                    rc.response().end(writer.toString());
-                } ).exceptionally(t -> handleFail(rc, t));
+        .subscribe().with( fortunes -> {
+            fortunes.add(new Fortune(0, "Additional fortune added at request time."));
+            fortunes.sort(Comparator.comparing(fortune -> fortune.getMessage()));
+            StringWriter writer = new StringWriter();
+            template.execute(writer, Collections.singletonMap("fortunes", fortunes));
+            rc.response().putHeader("Content-Type", "text/html;charset=UTF-8");
+            rc.response().end(writer.toString());
+        },
+                           t -> handleFail(rc, t));
     }
 }
