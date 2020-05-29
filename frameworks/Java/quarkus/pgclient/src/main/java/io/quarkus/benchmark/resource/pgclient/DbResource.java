@@ -1,54 +1,47 @@
 package io.quarkus.benchmark.resource.pgclient;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 
 import io.quarkus.benchmark.model.World;
 import io.quarkus.benchmark.repository.pgclient.WorldRepository;
+import io.quarkus.vertx.web.Route;
+import io.vertx.ext.web.RoutingContext;
 
 
 @ApplicationScoped
-@Path("/")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class DbResource {
+public class DbResource extends BaseResource {
 
     @Inject
     WorldRepository worldRepository;
 
-    @GET
-    @Path("/db")
-    public CompletionStage<World> db() {
-        return randomWorld();
+    @Route(path = "db")
+    public void db(RoutingContext rc) {
+        randomWorld().thenAccept(world -> sendJson(rc, world)).exceptionally(t -> handleFail(rc, t));
     }
 
-    @GET
-    @Path("/queries")
-    public CompletionStage<List<World>> queries(@QueryParam("queries") String queries) {
+    @Route(path = "queries")
+    public void queries(RoutingContext rc) {
+        var queries = rc.request().getParam("queries");
         var worlds = new CompletableFuture[parseQueryCount(queries)];
         var ret = new World[worlds.length];
         Arrays.setAll(worlds, i -> {
             return randomWorld().thenApply(w -> ret[i] = w);
         });
 
-        return CompletableFuture.allOf(worlds).thenApply(v -> Arrays.asList(ret));
+        CompletableFuture.allOf(worlds).thenApply(v -> Arrays.asList(ret))
+                .thenAccept(list -> sendJson(rc, list))
+                .exceptionally(t -> handleFail(rc, t));
     }
 
-    @GET
-    @Path("/updates")
-    public CompletionStage<List<World>> updates(@QueryParam("queries") String queries) {
+    @Route(path = "updates")
+    public void updates(RoutingContext rc) {
+        var queries = rc.request().getParam("queries");
         var worlds = new CompletableFuture[parseQueryCount(queries)];
         var ret = new World[worlds.length];
         Arrays.setAll(worlds, i -> {
@@ -59,7 +52,10 @@ public class DbResource {
             });
         });
 
-        return CompletableFuture.allOf(worlds).thenCompose(v -> worldRepository.update(ret)).thenApply(v -> Arrays.asList(ret));
+        CompletableFuture.allOf(worlds)
+            .thenCompose(v -> worldRepository.update(ret)).thenApply(v -> Arrays.asList(ret))
+            .thenAccept(list -> sendJson(rc, list))
+            .exceptionally(t -> handleFail(rc, t));
     }
 
     private CompletionStage<World> randomWorld() {

@@ -5,7 +5,7 @@ COPY base/pom.xml base/pom.xml
 COPY hibernate/pom.xml hibernate/pom.xml
 COPY pgclient/pom.xml pgclient/pom.xml
 RUN mvn dependency:go-offline -q -pl base
-COPY base/src base/src
+COPY base/src/main/resources base/src/main/resources
 COPY hibernate/src hibernate/src
 COPY pgclient/src pgclient/src
 
