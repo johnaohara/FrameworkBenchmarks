@@ -1,7 +1,5 @@
 package io.quarkus.benchmark.repository.pgclient;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,7 +11,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.vertx.axle.core.Vertx;
 import io.vertx.axle.pgclient.PgPool;
-import io.vertx.axle.sqlclient.SqlClient;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
@@ -35,16 +32,6 @@ public class PgClientFactory {
 	@Produces
 	@ApplicationScoped
 	public PgClients pgClients() {
-//		final int n = Runtime.getRuntime().availableProcessors();
-//		List<SqlClient> clients = new ArrayList<>(n);
-//		List<PgPool> pools = new ArrayList<>(n);
-//
-//		for (int i = 0; i < n; i++) {
-//			clients.add(sqlClient(vertx, 1));
-//			pools.add(sqlClient(vertx, 4));
-//		}
-//
-//		return new PgClients(clients, pools);
 	    return new PgClients(this);
 	}
 
