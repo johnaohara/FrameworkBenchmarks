@@ -22,7 +22,7 @@
         "versus": "Netty"
       },
       "hibernate": {
-        "db_url": "/db",
+        "db_url": "/eventloop/db",
         "query_url": "/queries?queries=",
         "fortune_url": "/fortunes",
         "port": 8080,
