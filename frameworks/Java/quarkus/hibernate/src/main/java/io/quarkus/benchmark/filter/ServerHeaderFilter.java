@@ -18,13 +18,14 @@ public class ServerHeaderFilter implements ContainerResponseFilter {
     protected static String date;
 
     private static final String SERVER = "Server";
+    private static final String DATE = "Date";
     private static final String QUARKUS = "Quarkus";
 
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         responseContext.getHeaders().add(SERVER, QUARKUS);
-        responseContext.getHeaders().add(HttpHeaderNames.DATE, date);
+        responseContext.getHeaders().add(DATE, date);
     }
 
 
