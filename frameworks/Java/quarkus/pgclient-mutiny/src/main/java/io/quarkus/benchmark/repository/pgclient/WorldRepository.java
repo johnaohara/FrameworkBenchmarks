@@ -8,20 +8,28 @@ import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.concurrent.ThreadLocalRandom;
 
 @ApplicationScoped
 public class WorldRepository {
 
-
+    private static final String SELECT_WORLD = "SELECT id, randomnumber from WORLD where id=$1";
 
     @Inject
-    PgPool client;
+    PgClients pgClients;
 
     public Uni<World> find(int id) {
 
-        return client.preparedQuery("SELECT id, first_name, last_name  FROM person WHERE id = $1", Tuple.of(id))
+        return pgClients.getClient().preparedQuery(SELECT_WORLD, Tuple.of(id))
                 .map(rows -> rows.iterator().next())
-                .onItem().produceUni( row -> Uni.createFrom().item(World.from(row)));
+                .onItem().produceUni(row -> Uni.createFrom().item(World.from(row)));
+    }
+
+
+    public Uni<World> findRandom() {
+
+        return find(randomWorldNumber());
+
     }
 
     public Single<World> update(World world) {
@@ -32,5 +40,10 @@ public class WorldRepository {
 //                .map(rows -> world)
 //                .subscribeOn(scheduler);
         return null;
+    }
+
+
+    private int randomWorldNumber() {
+        return 1 + ThreadLocalRandom.current().nextInt(10000);
     }
 }
