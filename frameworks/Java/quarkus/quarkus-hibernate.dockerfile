@@ -4,10 +4,20 @@ COPY pom.xml pom.xml
 COPY base/pom.xml base/pom.xml
 COPY hibernate/pom.xml hibernate/pom.xml
 COPY pgclient/pom.xml pgclient/pom.xml
+COPY pgclient-mutiny/pom.xml  pgclient-mutiny/pom.xml
+COPY pgclient-mutiny-iterator/pom.xml  pgclient-mutiny-iterator/pom.xml
+COPY pgclient-reactiverse/pom.xml pgclient-reactiverse/pom.xml
+COPY pgclient-reactiverse-custom-pool/pom.xml pgclient-reactiverse-custom-pool/pom.xml
+COPY pgclient-reactiverse-thread-local/pom.xml pgclient-reactiverse-thread-local/pom.xml
 RUN mvn dependency:go-offline -q -pl base
 COPY base/src base/src
 COPY hibernate/src hibernate/src
 COPY pgclient/src pgclient/src
+COPY pgclient-mutiny/src pgclient-mutiny/src
+COPY pgclient-mutiny-iterator/src pgclient-mutiny-iterator/src
+COPY pgclient-reactiverse/src pgclient-reactiverse/src
+COPY pgclient-reactiverse-custom-pool/src pgclient-reactiverse-custom-pool/src
+COPY pgclient-reactiverse-thread-local/src pgclient-reactiverse-thread-local/src
 
 RUN mvn package -q -pl hibernate -am
 
