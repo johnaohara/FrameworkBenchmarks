@@ -15,11 +15,14 @@ import io.vertx.mutiny.sqlclient.Tuple;
 @ApplicationScoped
 public class WorldRepository {
 
+    private static final String FIND_QUERY = "SELECT * FROM World WHERE id = $1";
+    private static final String UPDATE_QUERY = "UPDATE World SET randomNumber = $2 WHERE id = $1";
+
     @Inject
     PgClients clients;
 
     public Uni<World> find(int id) {
-        return clients.getClient().preparedQuery("SELECT * FROM World WHERE id = $1", Tuple.of(id))
+        return clients.getClient().preparedQuery(FIND_QUERY, Tuple.of(id))
                 .map(rowset -> {
                     Row row = rowset.iterator().next();
                     return new World(row.getInteger(0), row.getInteger(1));
@@ -32,7 +35,7 @@ public class WorldRepository {
         for(World world : worlds) {
             args.add(Tuple.of(world.getId(), world.getRandomNumber()));
         }
-        return clients.getPool().preparedBatch("UPDATE World SET randomNumber = $2 WHERE id = $1", args)
+        return clients.getPool().preparedBatch(UPDATE_QUERY, args)
                 .map(v -> null);
     }
 }

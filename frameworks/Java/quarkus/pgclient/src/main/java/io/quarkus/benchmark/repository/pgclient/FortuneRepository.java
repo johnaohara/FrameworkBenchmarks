@@ -21,7 +21,7 @@ public class FortuneRepository {
                 .map(rowset -> {
                     List<Fortune> ret = new ArrayList<>(rowset.size()+1);
                     for(Row r : rowset) {
-                        ret.add(new Fortune(r.getInteger("id"), r.getString("message")));
+                        ret.add(new Fortune( r.getInteger("id"), r.getString("message")));
                     }
                     return ret;
                 });
