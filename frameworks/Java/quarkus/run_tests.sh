@@ -12,7 +12,9 @@ CWD=$(pwd)
 
 DB_NETWORK_LATENCIES=(0ms 1ms)
 #DB_NETWORK_LATENCIES=(0ms)
-DB_CONNECTIONS=(1 2 4 8)
+#DB_CONNECTIONS=(1 2 4 8)
+#DB_CONNECTIONS=(1 8)
+DB_CONNECTIONS=( 4 )
 #DB_CONNECTIONS=(1 4 8)
 CORES=(1 2)
 #CORES=(1)
@@ -20,8 +22,8 @@ CPU_MASKS=(0x00000001 0x00000003)
 #CPU_MASKS=(0x00000001)
 CORE_MULTIPLES=(1 2)
 #CORE_MULTIPLES=(1)
-APPLICATIONS=(hibernate hibernate-reactive hibernate-reactive-routes-blocking pgclient)
-#APPLICATIONS=(pgclient)
+#APPLICATIONS=(hibernate hibernate-reactive hibernate-reactive-routes-blocking pgclient)
+APPLICATIONS=(hibernate-reactive)
 
 APP_STATUS="["
 export QUARKUS_HTTP_PORT=8182
@@ -110,7 +112,7 @@ function loadDB(){
   echo "$(date): Running DB Load: port; $PORT"
   echo "$(date): Running DB Warmup"
   #WARM-UP
-  wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 60 -c 128 --timeout 8 -t 24  "http://localhost:$PORT/db" > /dev/null
+  wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 20 -c 128 --timeout 8 -t 24  "http://localhost:$PORT/db" > /dev/null
 
   echo ""
   echo "$(date): Starting measurements"
@@ -124,7 +126,9 @@ function loadDB(){
     do
         FILENAME=$OUTPUT/$NAME.$CONNECTIONS.$load.wrk
         echo "$(date): Running DB:  $NAME (connections; $CONNECTIONS, load; $load). Writing to $FILENAME"
-        wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 15 -c $CONNECTIONS --timeout 8 -t 24  "http://localhost:$PORT/db" > "$FILENAME"
+        ENDPOINT="http://localhost:$PORT/db"
+        echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
+        wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
     done
   done
 
@@ -141,12 +145,13 @@ function loadUpdates(){
   #CONNECTIONS=(128 256 512 1024)
   CONNECTIONS=(256)
 
-  QUERIES=(1 4 8)
+#  QUERIES=(1 4 8)
+  QUERIES=(1 8)
 
   echo "$(date): Running Update Load: port; $PORT"
   echo "$(date): Running Update Warmup"
   #WARM-UP
-  wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 60 -c 128 --timeout 8 -t 24  "http://localhost:$PORT/updates?queries=1" > /dev/null
+  wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 20 -c 128 --timeout 8 -t 24  "http://localhost:$PORT/updates?queries=1" > /dev/null
 
   echo ""
   echo "$(date): Starting measurements"
@@ -162,7 +167,9 @@ function loadUpdates(){
         do
           FILENAME="$OUTPUT/$NAME.$CONNECTIONS.$load.$QUERY.wrk"
           echo "$(date): Running Updates:  $NAME (connections; $CONNECTIONS, load; $load, queries; $QUERY). Writing to $FILENAME"
-          wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 15 -c $CONNECTIONS --timeout 8 -t 24  "http://localhost:$PORT/updates?queries=$QUERY" > "$FILENAME"
+          ENDPOINT="http://localhost:$PORT/updates?queries=$QUERY"
+          echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
+          wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME
         done
     done
   done
