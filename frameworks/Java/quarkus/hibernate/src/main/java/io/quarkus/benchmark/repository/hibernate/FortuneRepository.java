@@ -1,7 +1,7 @@
 package io.quarkus.benchmark.repository.hibernate;
 
+import io.quarkus.benchmark.cdi.HibernateOrmNativeComponents;
 import io.quarkus.benchmark.model.hibernate.Fortune;
-import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,11 +15,11 @@ import java.util.List;
 public class FortuneRepository {
 
     @Inject
-    SessionFactory sf;
+    HibernateOrmNativeComponents nativeComponents;
 
     public List<Fortune> findAllStateless() {
-        try (StatelessSession s = sf.openStatelessSession()) {
-            CriteriaBuilder criteriaBuilder = sf.getCriteriaBuilder();
+        try (StatelessSession s = nativeComponents.openStatelessSession()) {
+            CriteriaBuilder criteriaBuilder = nativeComponents.getCriteriaBuilder();
             CriteriaQuery<Fortune> fortuneQuery = criteriaBuilder.createQuery(Fortune.class);
             Root<Fortune> from = fortuneQuery.from(Fortune.class);
             fortuneQuery.select(from);

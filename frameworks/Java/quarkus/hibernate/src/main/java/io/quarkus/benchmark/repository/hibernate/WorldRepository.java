@@ -9,10 +9,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
+import io.quarkus.benchmark.cdi.HibernateOrmNativeComponents;
 import io.quarkus.benchmark.model.hibernate.World;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 
 
@@ -20,7 +20,7 @@ import org.hibernate.StatelessSession;
 public class WorldRepository {
 
     @Inject
-    SessionFactory sf;
+    HibernateOrmNativeComponents nativeComponents;
 
     /**
      * This method is not required (nor specified) by the benchmark rules,
@@ -29,7 +29,7 @@ public class WorldRepository {
      */
     @Transactional
     public void createData() {
-        try (StatelessSession statelessSession = sf.openStatelessSession()) {
+        try (StatelessSession statelessSession = nativeComponents.openStatelessSession()) {
             final ThreadLocalRandom random = ThreadLocalRandom.current();
             for (int i=1; i<=10000; i++) {
                 final World world = new World();
@@ -41,13 +41,13 @@ public class WorldRepository {
     }
 
     public World findSingleAndStateless(int id) {
-        try (StatelessSession ss = sf.openStatelessSession()) {
+        try (StatelessSession ss = nativeComponents.openStatelessSession()) {
             return singleStatelessWorldLoad(ss,id);
         }
     }
 
     public void updateAll(Collection<World> worlds) {
-        try (Session s = sf.openSession()) {
+        try (Session s = nativeComponents.openSession()) {
             s.setJdbcBatchSize(worlds.size());
             s.setHibernateFlushMode(FlushMode.MANUAL);
             for (World w : worlds) {
@@ -58,7 +58,7 @@ public class WorldRepository {
     }
 
     public Collection<World> findReadonly(Set<Integer> ids) {
-        try (StatelessSession s = sf.openStatelessSession()) {
+        try (StatelessSession s = nativeComponents.openStatelessSession()) {
             //The rules require individual load: we can't use the Hibernate feature which allows load by multiple IDs as one single operation
             ArrayList l = new ArrayList<>(ids.size());
             for (Integer id : ids) {
@@ -69,7 +69,7 @@ public class WorldRepository {
     }
 
     public Collection<World> find(Set<Integer> ids) {
-        try (Session s = sf.openSession()) {
+        try (Session s = nativeComponents.openSession()) {
             return find(s, ids);
         }
     }
@@ -92,7 +92,7 @@ public class WorldRepository {
     }
 
     public Session openSession() {
-        return sf.openSession();
+        return nativeComponents.openSession();
     }
 
 }
