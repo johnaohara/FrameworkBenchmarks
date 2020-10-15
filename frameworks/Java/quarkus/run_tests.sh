@@ -205,7 +205,7 @@ function runTests(){
 
   echo "$(date): populate database - done"
 
-  ITERATIONS=$(( ${#DB_NETWORK_LATENCIES[@]} * ${#DB_CONNECTIONS[@]} * ${#CORES[@]} * ${#CORE_MULTIPLES[@]} * ${#APPLICATIONS[@]} ))
+  ITERATIONS=$(( ${#DB_NETWORK_LATENCIES[@]} * ${#DB_CONNECTIONS[@]} * ${#CORES[@]} * ${#EVENT_LOOP_MULTIPLIERS[@]} * ${#APPLICATIONS[@]} ))
   COUNTER=0
 
   for LATENCY in "${DB_NETWORK_LATENCIES[@]}"
@@ -218,9 +218,9 @@ function runTests(){
     do
       CPU_MASK="${CPU_MASKS[$CORE - 1]}"
       echo "$(date): Setting cores: $CORE with mask $CPU_MASK"
-      for CORE_MULTIPLE in "${CORE_MULTIPLES[@]}"
+      for EVENT_LOOP_MULTIPLIER in "${EVENT_LOOP_MULTIPLIERS[@]}"
       do
-        EVENT_LOOPS=$(( CORE * CORE_MULTIPLE ))
+        EVENT_LOOPS=$(( CORE * EVENT_LOOP_MULTIPLIER ))
         echo "$(date): Setting Event Loops: $EVENT_LOOPS"
 
         for DATA_CONNECTION in "${DB_CONNECTIONS[@]}"
@@ -247,6 +247,9 @@ function runTests(){
             #start application
             cd $APPLICATION
             CONFIG=`cat java.conf`
+
+            #rebuild
+            mvn clean package
 
             RESULT_FILENAME="$APPLICATION.$LATENCY.cores-$CORE.eventloops-$EVENT_LOOPS.db-connections-$DATA_CONNECTION"
             LOG_FILE=$OUTPUT_DIR/logs/$RESULT_FILENAME.log
@@ -330,7 +333,7 @@ function runTests(){
 
           done #APPLICATION
         done #DATA_CONNECTION
-      done #CORE_MULTIPLE
+      done #EVENT_LOOP_MULTIPLIER
     done #CORE
   done #LATENCY
 
