@@ -1,56 +1,47 @@
 #!/bin/bash
 echo "$(date): Start"
 DATE_STAMP=$(date +%Y_%m_%d_%H_%M)
-export OUTPUT_DIR=/tmp/benchmark/$DATE_STAMP
+export OUTPUT_DIR=/working/stats/hibernateReactive/scratch/$DATE_STAMP
 
+TEST_DB=false
+TEST_UPDATE=true
 
+LOAD_LEVELS=$1
+
+FIND_LIMITS=false
+if [ $# -eq 2 ]
+  then
+    FIND_LIMITS=$2
+fi
+
+echo "Find limits: $FIND_LIMITS"
 
 rm -Rf $OUTPUT_DIR
 mkdir -p $OUTPUT_DIR/results
 mkdir -p $OUTPUT_DIR/logs
 CWD=$(pwd)
 
-DB_NETWORK_LATENCIES=(0ms 1ms)
-#DB_NETWORK_LATENCIES=(0ms)
+#DB_NETWORK_LATENCIES=(0ms 1ms)
+DB_NETWORK_LATENCIES=(0ms)
 #DB_CONNECTIONS=(1 2 4 8)
 #DB_CONNECTIONS=(1 8)
-DB_CONNECTIONS=( 4 )
-#DB_CONNECTIONS=(1 4 8)
-CORES=(1 2)
-#CORES=(1)
+DB_CONNECTIONS=(4)
+#DB_CONNECTIONS=(1 4)
+#CORES=(1 2)
+CORES=(2)
 CPU_MASKS=(0x00000001 0x00000003)
-#CPU_MASKS=(0x00000001)
-CORE_MULTIPLES=(1 2)
-#CORE_MULTIPLES=(1)
+#CPU_MASKS=(0x00000003)
+#EVENT_LOOP_MULTIPLIERS=(1 2)
+EVENT_LOOP_MULTIPLIERS=(2)
 #APPLICATIONS=(hibernate hibernate-reactive hibernate-reactive-routes-blocking pgclient)
-APPLICATIONS=(hibernate-reactive)
+APPLICATIONS=(hibernate hibernate-reactive)
+#APPLICATIONS=(hibernate-reactive-routes-blocking pgclient)
 
 APP_STATUS="["
 export QUARKUS_HTTP_PORT=8182
 
-#DB load levels
-declare -A DB_LOAD
-DB_LOAD[pgclient-1]="10000,20000,30000,42000,44000,46000"
-DB_LOAD[hibernate-1]="10000,12000,14000"
-DB_LOAD[hibernate-reactive-1]="10000,20000,22000,24000,26000"
-DB_LOAD[hibernate-reactive-routes-blocking-1]="10000,20000,24000,28000,30000"
-
-DB_LOAD[pgclient-2]="30000,40000,60000,80000,88000,90000,92000"
-DB_LOAD[hibernate-2]="30000,32000,34000,36000,38000"
-DB_LOAD[hibernate-reactive-2]="30000,40000,44000,46000,48000"
-DB_LOAD[hibernate-reactive-routes-blocking-2]="30000,40000,46000,48000,50000"
-
-#Query load levels
-declare -A UPDATE_LOAD
-UPDATE_LOAD[pgclient-1]="50,100,150,200,250"
-UPDATE_LOAD[hibernate-1]="50,100,150,200,250"
-UPDATE_LOAD[hibernate-reactive-1]="50,100,150,200,250"
-UPDATE_LOAD[hibernate-reactive-routes-blocking-1]="50,100,150,200,250"
-
-UPDATE_LOAD[pgclient-2]="50,100,150,200,250"
-UPDATE_LOAD[hibernate-2]="50,100,150,200,250"
-UPDATE_LOAD[hibernate-reactive-2]="50,100,150,200,250"
-UPDATE_LOAD[hibernate-reactive-routes-blocking-2]="50,100,150,200,250"
+#load levels
+source $LOAD_LEVELS
 
 function getDbConnectionCount(){
   ps -AF | grep "[b]enchmarkdbuser hello_world" | wc | awk '{ print $1}'
@@ -122,14 +113,23 @@ function loadDB(){
 
   for CONNECTION in $CONNECTIONS
   do
-    for load in "${LOADS[@]}"
-    do
-        FILENAME=$OUTPUT/$NAME.$CONNECTIONS.$load.wrk
-        echo "$(date): Running DB:  $NAME (connections; $CONNECTIONS, load; $load). Writing to $FILENAME"
-        ENDPOINT="http://localhost:$PORT/db"
-        echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
-        wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
-    done
+    if [[ "x$FIND_LIMITS" == "xtrue" ]]
+    then
+      FILENAME=$OUTPUT/$NAME.$CONNECTIONS.$load.wrk
+      echo "$(date): Running DB:  $NAME (connections; $CONNECTIONS, load; $load). Writing to $FILENAME"
+      ENDPOINT="http://localhost:$PORT/db"
+      echo "Running load: wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
+      wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
+    else
+      for load in "${LOADS[@]}"
+      do
+          FILENAME=$OUTPUT/$NAME.$CONNECTIONS.$load.wrk2
+          echo "$(date): Running DB:  $NAME (connections; $CONNECTIONS, load; $load). Writing to $FILENAME"
+          ENDPOINT="http://localhost:$PORT/db"
+          echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
+          wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
+      done
+    fi
   done
 
   echo "$(date): Done DB Load"
@@ -143,7 +143,7 @@ function loadUpdates(){
   OUTPUT=$4
 
   #CONNECTIONS=(128 256 512 1024)
-  CONNECTIONS=(256)
+  CONNECTIONS=(50)
 
 #  QUERIES=(1 4 8)
   QUERIES=(1 8)
@@ -161,17 +161,31 @@ function loadUpdates(){
 
   for CONNECTION in $CONNECTIONS
   do
-    for load in "${LOADS[@]}"
-    do
-        for QUERY in "${QUERIES[@]}"
-        do
-          FILENAME="$OUTPUT/$NAME.$CONNECTIONS.$load.$QUERY.wrk"
-          echo "$(date): Running Updates:  $NAME (connections; $CONNECTIONS, load; $load, queries; $QUERY). Writing to $FILENAME"
-          ENDPOINT="http://localhost:$PORT/updates?queries=$QUERY"
-          echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
-          wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME
-        done
-    done
+    if [[ "x$FIND_LIMITS" == "xtrue" ]]
+    then
+      for QUERY in "${QUERIES[@]}"
+      do
+        FILENAME="$OUTPUT/$NAME.$CONNECTIONS.$load.$QUERY.wrk"
+        echo "$(date): Running Updates:  $NAME (connections; $CONNECTIONS, load; $load, queries; $QUERY). Writing to $FILENAME"
+        ENDPOINT="http://localhost:$PORT/updates?queries=$QUERY"
+        echo "Running load: wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
+        wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME
+      done
+    else
+      for load in "${LOADS[@]}"
+      do
+          for QUERY in "${QUERIES[@]}"
+          do
+            FILENAME="$OUTPUT/$NAME.$CONNECTIONS.$load.$QUERY.wrk2"
+            echo "$(date): Running Updates:  $NAME (connections; $CONNECTIONS, load; $load, queries; $QUERY). Writing to $FILENAME"
+            ENDPOINT="http://localhost:$PORT/updates?queries=$QUERY"
+            echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
+            wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 10 $ENDPOINT  > $FILENAME
+          done
+      done
+    fi
+
+
   done
 
   echo "$(date): Done Update Load"
@@ -210,7 +224,7 @@ function runTests(){
 
   for LATENCY in "${DB_NETWORK_LATENCIES[@]}"
   do
-  sudo tc qdisc del dev cni-podman0 root
+    sudo tc qdisc del dev cni-podman0 root
     echo "$(date): Setting network latency: $LATENCY"
     sudo tc qdisc add dev cni-podman0 root netem delay $LATENCY
 
@@ -220,6 +234,7 @@ function runTests(){
       echo "$(date): Setting cores: $CORE with mask $CPU_MASK"
       for EVENT_LOOP_MULTIPLIER in "${EVENT_LOOP_MULTIPLIERS[@]}"
       do
+        echo "Start event loop multiplier"
         EVENT_LOOPS=$(( CORE * EVENT_LOOP_MULTIPLIER ))
         echo "$(date): Setting Event Loops: $EVENT_LOOPS"
 
@@ -318,14 +333,21 @@ function runTests(){
             APP_STATUS="$APP_STATUS $appJson , "
 
             #run tests
-            LOAD_INDEX="$APPLICATION-$CORE"
+            LOAD_INDEX="$APPLICATION-$CORE-$LATENCY"
             DB_LOAD_LEVEL="${DB_LOAD[$LOAD_INDEX]}"
-            echo "$(date): Testing: $APPLICATION (db) with load: $DB_LOAD_LEVEL, output dir: $OUTPUT_DIR/results"
-            loadDB $QUARKUS_HTTP_PORT "db.$RESULT_FILENAME" "$DB_LOAD_LEVEL" $OUTPUT_DIR/results
 
-            QUERY_LOAD_LEVEL="${UPDATE_LOAD[$LOAD_INDEX]}"
-            echo "$(date): Testing: $APPLICATION (update) with load: $QUERY_LOAD_LEVEL, output dir: $OUTPUT_DIR/results"
-            loadUpdates $QUARKUS_HTTP_PORT "update.$RESULT_FILENAME" "$QUERY_LOAD_LEVEL" $OUTPUT_DIR/results
+            if [[ "x$TEST_DB" == "xtrue" ]]
+            then
+              echo "$(date): Testing: $APPLICATION (db) with load: $DB_LOAD_LEVEL, output dir: $OUTPUT_DIR/results"
+              loadDB $QUARKUS_HTTP_PORT "db.$RESULT_FILENAME" "$DB_LOAD_LEVEL" $OUTPUT_DIR/results
+            fi
+
+            if [[ "x$TEST_UPDATE" == "xtrue" ]]
+            then
+              QUERY_LOAD_LEVEL="${UPDATE_LOAD[$LOAD_INDEX]}"
+              echo "$(date): Testing: $APPLICATION (update) with load: $QUERY_LOAD_LEVEL, output dir: $OUTPUT_DIR/results"
+              loadUpdates $QUARKUS_HTTP_PORT "update.$RESULT_FILENAME" "$QUERY_LOAD_LEVEL" $OUTPUT_DIR/results
+            fi
 
             kill -15 $APP_PID
             sleep 3s
