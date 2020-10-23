@@ -3,10 +3,13 @@ echo "$(date): Start"
 DATE_STAMP=$(date +%Y_%m_%d_%H_%M)
 export OUTPUT_DIR=/working/stats/hibernateReactive/scratch/$DATE_STAMP
 
-TEST_DB=false
+TEST_DB=true
 TEST_UPDATE=true
 
 LOAD_LEVELS=$1
+
+WARMUP_DURATION=20
+TEST_DURATION=60
 
 FIND_LIMITS=false
 if [ $# -eq 2 ]
@@ -118,16 +121,16 @@ function loadDB(){
       FILENAME=$OUTPUT/$NAME.$CONNECTIONS.$load.wrk
       echo "$(date): Running DB:  $NAME (connections; $CONNECTIONS, load; $load). Writing to $FILENAME"
       ENDPOINT="http://localhost:$PORT/db"
-      echo "Running load: wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
-      wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
+      echo "Running load: wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATION -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
+      wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATION -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
     else
       for load in "${LOADS[@]}"
       do
           FILENAME=$OUTPUT/$NAME.$CONNECTIONS.$load.wrk2
           echo "$(date): Running DB:  $NAME (connections; $CONNECTIONS, load; $load). Writing to $FILENAME"
           ENDPOINT="http://localhost:$PORT/db"
-          echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
-          wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
+          echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATION -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME"
+          wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATION -c $CONNECTIONS --timeout 8 -t 24  $ENDPOINT > $FILENAME
       done
     fi
   done
@@ -151,7 +154,7 @@ function loadUpdates(){
   echo "$(date): Running Update Load: port; $PORT"
   echo "$(date): Running Update Warmup"
   #WARM-UP
-  wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 20 -c 128 --timeout 8 -t 24  "http://localhost:$PORT/updates?queries=1" > /dev/null
+  wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $WARMUP_DURATION -c 128 --timeout 8 -t 24  "http://localhost:$PORT/updates?queries=1" > /dev/null
 
   echo ""
   echo "$(date): Starting measurements"
@@ -168,8 +171,8 @@ function loadUpdates(){
         FILENAME="$OUTPUT/$NAME.$CONNECTIONS.$load.$QUERY.wrk"
         echo "$(date): Running Updates:  $NAME (connections; $CONNECTIONS, load; $load, queries; $QUERY). Writing to $FILENAME"
         ENDPOINT="http://localhost:$PORT/updates?queries=$QUERY"
-        echo "Running load: wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
-        wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME
+        echo "Running load: wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATION -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
+        wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATION -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME
       done
     else
       for load in "${LOADS[@]}"
@@ -179,8 +182,8 @@ function loadUpdates(){
             FILENAME="$OUTPUT/$NAME.$CONNECTIONS.$load.$QUERY.wrk2"
             echo "$(date): Running Updates:  $NAME (connections; $CONNECTIONS, load; $load, queries; $QUERY). Writing to $FILENAME"
             ENDPOINT="http://localhost:$PORT/updates?queries=$QUERY"
-            echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
-            wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c $CONNECTIONS --timeout 8 -t 10 $ENDPOINT  > $FILENAME
+            echo "Running load: wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATION -c $CONNECTIONS --timeout 8 -t 24 $ENDPOINT  > $FILENAME"
+            wrk2 -R $load -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $TEST_DURATIONc $CONNECTIONS --timeout 8 -t 10 $ENDPOINT  > $FILENAME
           done
       done
     fi
@@ -285,7 +288,7 @@ function runTests(){
             cd $CWD
 
             #pre-warm application
-            wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d 10 -c 128 --timeout 8 -t 24  "http://localhost:$QUARKUS_HTTP_PORT/db" > /dev/null
+            wrk -H 'Host: localhost' -H 'Accept: application/json,text/html;q=0.9,application/xhtml+xml;q=0.9,application/xml;q=0.8,*/*;q=0.7' -H 'Connection: keep-alive' --latency -d $WARMUP_DURATION -c 128 --timeout 8 -t 24  "http://localhost:$QUARKUS_HTTP_PORT/db" > /dev/null
 
             #test number of DB connections
             OPEN_DB_CONNECTIONS=$(getDbConnectionCount)
