@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.hibernate.FlushMode;
 import org.hibernate.reactive.mutiny.Mutiny;
 import org.hibernate.reactive.mutiny.Mutiny.Session;
 
@@ -61,5 +64,4 @@ public class WorldRepositoryMutiny extends MutinyBaseRepository {
     private static Uni<World> singleFind(final Mutiny.Session ss, final Integer id) {
         return ss.find(World.class, id);
     }
-
 }

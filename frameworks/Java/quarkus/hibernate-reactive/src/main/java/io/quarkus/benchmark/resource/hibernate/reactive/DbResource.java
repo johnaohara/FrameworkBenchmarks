@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.hibernate.FlushMode;
 import org.hibernate.reactive.mutiny.Mutiny;
@@ -25,17 +26,14 @@ public class DbResource extends BaseResource {
     WorldRepositoryMutiny worldRepository;
 
     @Route(path = "db")
-    public void db(RoutingContext rc) {
-        randomWorld().subscribe().with(world -> sendJson(rc, world),
-                                       t -> handleFail(rc, t));
+    public Uni<World> db() {
+        return randomWorld();
     }
 
     @Route(path = "queries")
-    public void queries(RoutingContext rc) {
+    public Uni<Collection<World>>  queries(RoutingContext rc) {
         var queries = rc.request().getParam("queries");
-        worldRepository.inSession(session -> randomWorldForRead(session, parseQueryCount(queries)))
-        .subscribe().with(list -> sendJson(rc, list),
-                          t -> handleFail(rc, t));
+        return worldRepository.inSession(session -> randomWorldForRead(session, parseQueryCount(queries)));
     }
 
     //Rules: https://github.com/TechEmpower/FrameworkBenchmarks/wiki/Project-Information-Framework-Tests-Overview#database-updates
@@ -44,9 +42,9 @@ public class DbResource extends BaseResource {
     // We therefore need to do a "read then write" while relinquishing the transaction between the two operations, as
     // all other tested frameworks seem to do.
     @Route(path = "updates")
-    public void updates(RoutingContext rc) {
+    public Uni<Collection<World>> updates(RoutingContext rc) {
         var queries = rc.request().getParam("queries");
-        worldRepository.inSession(session -> {
+        return worldRepository.inSession(session -> {
             // FIXME: not supported
             //          session.setJdbcBatchSize(worlds.size());
             session.setFlushMode(FlushMode.MANUAL);
@@ -64,8 +62,7 @@ public class DbResource extends BaseResource {
                 
                 return worldRepository.update(session, worldsCollection);
             });
-        }).subscribe().with(list -> sendJson(rc, list),
-                            t -> handleFail(rc, t));
+        });
     }
 
     private Uni<Collection<World>> randomWorldForRead(Mutiny.Session session, int count) {
