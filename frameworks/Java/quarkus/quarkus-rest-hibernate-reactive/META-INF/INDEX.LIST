@@ -1,0 +1,22 @@
+JarIndex-Version: 1.0
+
+quarkus-core-999-SNAPSHOT-HR-TESTING.jar
+META-INF
+META-INF/maven
+META-INF/maven/io.quarkus
+META-INF/maven/io.quarkus/quarkus-core
+META-INF/services
+io
+io/quarkus
+io/quarkus/runtime
+io/quarkus/runtime/annotations
+io/quarkus/runtime/appcds
+io/quarkus/runtime/configuration
+io/quarkus/runtime/graal
+io/quarkus/runtime/logging
+io/quarkus/runtime/metrics
+io/quarkus/runtime/shutdown
+io/quarkus/runtime/ssl
+io/quarkus/runtime/test
+io/quarkus/runtime/util
+

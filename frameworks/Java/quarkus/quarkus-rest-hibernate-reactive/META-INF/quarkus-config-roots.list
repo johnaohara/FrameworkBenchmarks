@@ -1,0 +1,10 @@
+io.quarkus.runtime.ApplicationConfig
+io.quarkus.runtime.BannerRuntimeConfig
+io.quarkus.runtime.CommandLineRuntimeConfig
+io.quarkus.runtime.LiveReloadConfig
+io.quarkus.runtime.LocalesBuildTimeConfig
+io.quarkus.runtime.ThreadPoolConfig
+io.quarkus.runtime.TopLevelRootConfig
+io.quarkus.runtime.logging.LogBuildTimeConfig
+io.quarkus.runtime.logging.LogConfig
+io.quarkus.runtime.shutdown.ShutdownConfig

@@ -1,0 +1,7 @@
+---
+name: "Quarkus - Core"
+metadata: {}
+group-id: "io.quarkus"
+artifact-id: "quarkus-core"
+version: "999-SNAPSHOT-HR-TESTING"
+description: "Quarkus core components"

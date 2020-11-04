@@ -17,6 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import io.quarkus.rest.Blocking;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
@@ -32,6 +33,7 @@ public class DbResource {
 
     @GET
     @Path("/db")
+    @Blocking
     public World db() {
         World world = randomWorldForRead();
         if (world==null) throw new IllegalStateException( "No data found in DB. Did you seed the database? Make sure to invoke /createdata once." );
@@ -40,6 +42,7 @@ public class DbResource {
 
     @GET
     @Path("/queries")
+    @Blocking
     public World[] queries(@QueryParam("queries") String queries) {
         final int count = parseQueryCount(queries);
         World[] worlds = randomWorldForRead(count).toArray(new World[0]);
@@ -48,6 +51,7 @@ public class DbResource {
 
     @GET
     @Path("/updates")
+    @Blocking
     //Rules: https://github.com/TechEmpower/FrameworkBenchmarks/wiki/Project-Information-Framework-Tests-Overview#database-updates
     //N.B. the benchmark seems to be designed to get in deadlocks when using a "safe pattern" of updating
     // the entity within the same transaction as the one which read it.
@@ -74,6 +78,7 @@ public class DbResource {
 
     @GET
     @Path( "/createdata" )
+    @Blocking
     public String createData() {
         worldRepository.createData();
         return "OK";

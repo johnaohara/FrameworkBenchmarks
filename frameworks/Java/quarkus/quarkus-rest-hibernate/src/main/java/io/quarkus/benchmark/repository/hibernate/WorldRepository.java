@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
@@ -12,7 +13,6 @@ import io.quarkus.benchmark.cdi.HibernateOrmNativeComponents;
 import io.quarkus.benchmark.model.hibernate.World;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 
 

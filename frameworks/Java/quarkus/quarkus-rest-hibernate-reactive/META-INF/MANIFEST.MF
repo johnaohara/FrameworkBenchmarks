@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.4.0
+Build-Jdk-Spec: 11
+Specification-Title: Quarkus - Core - Runtime
+Specification-Version: 999.0
+Specification-Vendor: JBoss by Red Hat
+Implementation-Title: Quarkus - Core - Runtime
+Implementation-Version: 999-SNAPSHOT-HR-TESTING
+Implementation-Vendor: JBoss by Red Hat
+Implementation-URL: http://www.jboss.org/quarkus-parent/quarkus-build-pa
+ rent/quarkus-core-parent/quarkus-core
+Java-Vendor: Oracle Corporation
+Java-Version: 11.0.7
+Os-Arch: amd64
+Os-Name: Linux
+Os-Version: 5.7.7-200.fc32.x86_64
+Scm-Connection: scm:git:git@github.com:quarkusio/quarkus.git/quarkus-bui
+ ld-parent/quarkus-core-parent/quarkus-core
+Scm-Revision: 01fe8bbe835fbd23d8a1d788ee2909b29c745889
+Scm-Url: https://github.com/quarkusio/quarkus/quarkus-build-parent/quark
+ us-core-parent/quarkus-core
+

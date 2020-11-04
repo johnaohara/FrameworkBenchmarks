@@ -4,7 +4,7 @@ DATE_STAMP=$(date +%Y_%m_%d_%H_%M)
 export OUTPUT_DIR=/working/stats/hibernateReactive/scratch/$DATE_STAMP
 
 TEST_DB=true
-TEST_UPDATE=true
+TEST_UPDATE=false
 
 LOAD_LEVELS=$1
 
@@ -24,18 +24,18 @@ mkdir -p $OUTPUT_DIR/results
 mkdir -p $OUTPUT_DIR/logs
 CWD=$(pwd)
 
-#DB_NETWORK_LATENCIES=(0ms 1ms)
-DB_NETWORK_LATENCIES=(0ms)
+DB_NETWORK_LATENCIES=(0ms 1ms)
+#DB_NETWORK_LATENCIES=(0ms)
 #DB_CONNECTIONS=(1 2 4 8)
 #DB_CONNECTIONS=(1 8)
 DB_CONNECTIONS=(4)
 #DB_CONNECTIONS=(1 4)
-#CORES=(1 2)
-CORES=(2)
+CORES=(1 2)
+#CORES=(2)
 CPU_MASKS=(0x00000001 0x00000003)
 #CPU_MASKS=(0x00000003)
-#EVENT_LOOP_MULTIPLIERS=(1 2)
-EVENT_LOOP_MULTIPLIERS=(2)
+EVENT_LOOP_MULTIPLIERS=(1 2)
+#EVENT_LOOP_MULTIPLIERS=(2)
 #APPLICATIONS=(hibernate hibernate-reactive hibernate-reactive-routes-blocking pgclient)
 APPLICATIONS=(hibernate hibernate-reactive)
 #APPLICATIONS=(hibernate-reactive-routes-blocking pgclient)

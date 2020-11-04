@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <quarkus.version>999-SNAPSHOT</quarkus.version>
+		<quarkus.version>999-SNAPSHOT-QUARKUS-REST</quarkus.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -16,6 +16,8 @@
 
     <modules>
         <module>base</module>
+        <module>quarkus-rest-hibernate</module>
+        <module>quarkus-rest-hibernate-reactive</module>
         <module>hibernate</module>
         <module>hibernate-event-loop</module>
         <module>hibernate-reactive</module>

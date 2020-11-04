@@ -2,7 +2,6 @@ package io.quarkus.benchmark.repository.hibernate;
 
 import io.quarkus.benchmark.cdi.HibernateOrmNativeComponents;
 import io.quarkus.benchmark.model.hibernate.Fortune;
-import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 
 import javax.enterprise.context.ApplicationScoped;
